@@ -1,0 +1,2 @@
+# `argparse` is used to process command-line arguments
+argparse == 1.4.0

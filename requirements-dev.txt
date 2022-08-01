@@ -1,0 +1,5 @@
+# `mypy` is used for static type checking
+mypy == 0.812.0
+
+# `yapf` is used for formatting the source files 
+yapf == 0.30.0
