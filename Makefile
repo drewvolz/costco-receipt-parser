@@ -1,4 +1,4 @@
-all: lint format
+all: lint format usage
 
 lint: mypy
 check: lint
@@ -9,4 +9,7 @@ mypy:
 format:
 	./script/format
 
-.PHONY: mypy lint format check all
+usage:
+	python3 ./script/update-usage.py
+
+.PHONY: mypy lint format usage check all

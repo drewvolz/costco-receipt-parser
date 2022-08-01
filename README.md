@@ -40,6 +40,7 @@ Other commands:
 $ python3 -m costcoparser --help
 ```
 
+<!--- START USAGE -->
 ```shell script
 usage: costcoparser [-h] -r RECEIPT
 
@@ -50,6 +51,7 @@ optional arguments:
   -r RECEIPT, --receipt RECEIPT
                         the path to the receipt JSON file
 ```
+<!--- END USAGE -->
 
 The main CLI entry point; see `--help`.
 

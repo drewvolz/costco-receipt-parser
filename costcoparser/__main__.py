@@ -118,7 +118,7 @@ def main(sys_args: Optional[List[str]] = None) -> int:
         sys_args = sys.argv[1:]
 
     parser = argparse.ArgumentParser(
-        prog='parse-receipt',
+        prog='costcoparser',
         description='Parse Costco JSON reciept data into a CSV.')
 
     parser.add_argument('-r',
