@@ -1,6 +1,6 @@
 # Costco receipt parser
 
-A script to turn Costco's json receipt into a csv for more further processing.
+A script to turn Costco's json receipt into a csv for further processing.
 
 Costco's printed and online receipts truncate item names for brevity. The full data can be found in the graphql response in the same data that builds the receipt you see online. We can create our own receipt with more context and customization by using the fields which have the full names of items and their metadata.
 
@@ -70,6 +70,7 @@ $ make
 An overall wrapper for the below two commands
 * Type checking and linting invoked with `mypy` via rules that live inside `.mypy.ini`.
 * Formatting invoked via `yapf` via rules that live inside `script/format`.
+* Updating usage in the README if the help invocation changes via `script/update-usage.py`
 
 ```shell script
 $ make format
