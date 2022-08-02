@@ -67,7 +67,7 @@ $ python3 -m costcoparser -r receipt.json
 $ make
 ```
 
-An overall wrapper for the below two commands
+An overall wrapper for:
 * Type checking and linting invoked with `mypy` via rules that live inside `.mypy.ini`.
 * Formatting invoked via `yapf` via rules that live inside `script/format`.
 * Updating usage in the README if the help invocation changes via `script/update-usage.py`
