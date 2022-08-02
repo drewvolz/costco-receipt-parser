@@ -1,4 +1,5 @@
-from typing import List, Optional, TypedDict
+from typing import List, Optional, Union
+from typing_extensions import TypedDict
 import sys
 import argparse
 import json
