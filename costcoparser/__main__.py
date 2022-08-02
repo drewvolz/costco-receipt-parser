@@ -6,18 +6,25 @@ import json
 import csv
 
 
-class Metadata(TypedDict):
-    total: int
-    subtotal: int
-    taxes: int
-    date: str
-    barcode: str
+class ArrayItem(TypedDict):
+    itemDescription01: str
+    itemNumber: int
+    amount: float
 
 
 class Item(TypedDict):
-    id: int
+    id: Optional[int]
     title: str
-    price: int
+    price: Optional[float]
+
+
+class Metadata(TypedDict, total=False):
+    documentType: str
+    itemArray: List[ArrayItem]
+    total: int
+    subTotal: int
+    taxes: int
+    transactionDate: str
 
 
 class Receipt(TypedDict):
@@ -25,27 +32,36 @@ class Receipt(TypedDict):
     metadata: Metadata
 
 
-def get_receipt_json(receipt):
+class ReceiptList(TypedDict):
+    receipts: List[Metadata]
+
+
+class ReceiptJson(TypedDict):
+    data: ReceiptList
+
+
+def get_receipt_json(file_path: str):
     try:
-        with open(receipt, 'r') as rf:
+        with open(file_path, 'r') as rf:
             return json.load(rf)
     except:
         print('Error: Costco receipt could not be read or was not found.')
 
 
-def get_item_data(item) -> Item:
+def get_item_data(item: ArrayItem) -> Item:
     # making the names easier to read (lowercasing)
-    item_title = item.get('itemDescription01')
+    item_title = item.get('itemDescription01', 'undefined title')
     cleaned_title = item_title[0] + item_title[1:].lower()
 
     id = item.get('itemNumber')
     title = cleaned_title
     price = item.get('amount')
 
-    return {'id': id, 'title': title, 'price': price}
+    parsed_item: Item = {'id': id, 'title': title, 'price': price}
+    return parsed_item
 
 
-def get_receipt_metadata(receipts) -> Metadata:
+def get_receipt_metadata(receipts: List[Metadata]) -> Metadata:
     # we should only end up with one item in this array
     # if we're already filtering receipts by what
     # documentType of WarehouseReceiptDetail.
@@ -55,45 +71,46 @@ def get_receipt_metadata(receipts) -> Metadata:
     ]
     receipt = receipts[0]
 
-    total = receipt.get('total')
-    subtotal = receipt.get('subTotal')
-    taxes = receipt.get('taxes')
-    date = receipt.get('transactionDate')
-    barcode = receipt.get('transactionBarcode')
+    total = receipt.get('total', sys.maxsize)
+    subtotal = receipt.get('subTotal', sys.maxsize)
+    taxes = receipt.get('taxes', sys.maxsize)
+    date = receipt.get('transactionDate', 'nodate')
 
-    return {
+    parsed_metadata: Metadata = {
         'total': total,
-        'subtotal': subtotal,
+        'subTotal': subtotal,
         'taxes': taxes,
-        'date': date,
-        'barcode': barcode
+        'transactionDate': date,
     }
 
+    return parsed_metadata
 
-def parse_receipt(receipt) -> Receipt:
+
+def parse_receipt(receipt: ReceiptJson) -> List[object]:
     items: List[Item] = []
     receipts = [
-        item for item in receipt.get('data').get('receipts') if not None
+        item for item in receipt.get('data', {}).get('receipts', {})
+        if not None
     ]
     metadata = get_receipt_metadata(receipts)
 
-    for receipt in receipts:
-        if receipt['itemArray'] is not None:
-            items = [get_item_data(item) for item in receipt['itemArray']]
+    for r in receipts:
+        if r['itemArray'] is not None:
+            items = [get_item_data(item) for item in r['itemArray']]
 
     return [items, metadata]
 
 
-def build_metadata_row(row_name, value):
-    return {'id': '', 'name': row_name, 'price': value}
+def build_metadata_row(row_name: str, value: int) -> Item:
+    return {'id': None, 'title': row_name, 'price': value}
 
 
-def write_to_csv(receipt: Receipt, metadata: Metadata):
-    header = ['id', 'name', 'price']
-    filename = f"costco-{metadata['date']}.csv"
+def write_to_csv(receipt: List[Item], metadata: Metadata) -> None:
+    header = ['id', 'title', 'price']
+    filename = f"costco-{metadata['transactionDate']}.csv"
 
     tax_row = build_metadata_row('taxes', metadata['taxes'])
-    subtotal_row = build_metadata_row('subtotal', metadata['subtotal'])
+    subtotal_row = build_metadata_row('subtotal', metadata['subTotal'])
     total_row = build_metadata_row('total', metadata['total'])
 
     with open(filename, 'w') as csvfile:
@@ -103,7 +120,7 @@ def write_to_csv(receipt: Receipt, metadata: Metadata):
         for item in receipt:
             csvwriter.writerow({
                 'id': item['id'],
-                'name': item['title'],
+                'title': item['title'],
                 'price': item['price']
             })
 
