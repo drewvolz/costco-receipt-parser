@@ -8,11 +8,11 @@ end = ('\n```\n' '<!--- END USAGE -->\n')
 contents = ''
 
 with open('README.md', 'r') as file:
-	contents = file.read()
+    contents = file.read()
 
 old_usage = contents[contents.find(start) + len(start):contents.rfind(end)]
 
 contents = contents.replace(old_usage, new_usage)
 
 with open('README.md', 'w') as file:
-	file.write(contents)
+    file.write(contents)
