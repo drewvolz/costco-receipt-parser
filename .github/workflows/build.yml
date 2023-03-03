@@ -36,6 +36,8 @@ jobs:
 
         # Custom linting
         make lint
-    - name: Run
+    - name: Test
       run: |
-        python3 -m costcoparser -h
+        python3 -m costcoparser --receipt example/input.json
+        diff example/output.csv costco-2021-01-01.csv && echo "Test passed! Files are identical." || exit 1
+
