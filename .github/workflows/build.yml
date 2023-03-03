@@ -22,11 +22,9 @@ jobs:
         python-version: "3.9"
     - name: Install dependencies
       run: |     
-        pwd
         # virutal environment
         python -m venv ./venv
         source ./venv/bin/activate
-        pwd
 
         python -m pip install --upgrade pip
         pip install flake8
@@ -35,6 +33,7 @@ jobs:
     - name: Lint
       run: |
         pwd
+        ls
         make lint
         # stop the build if there are Python syntax errors or undefined names
         flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
