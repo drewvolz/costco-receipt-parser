@@ -44,10 +44,11 @@ def get_receipt_json(file_path: str) -> ReceiptJson:
     try:
         with open(file_path, 'r') as rf:
             loaded_receipt_json = json.load(rf)
-    except:
+    except Exception:
         print('Error: Costco receipt could not be read or was not found.')
 
     return loaded_receipt_json
+
 
 def get_item_data(item: ArrayItem) -> Item:
     # making the names easier to read (lowercasing)
