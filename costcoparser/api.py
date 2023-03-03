@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import List, Optional, Tuple
 from typing_extensions import TypedDict
 import sys
 import json
@@ -39,13 +39,15 @@ class ReceiptJson(TypedDict):
     data: ReceiptList
 
 
-def get_receipt_json(file_path: str):
+def get_receipt_json(file_path: str) -> ReceiptJson:
+    loaded_receipt_json: ReceiptJson
     try:
         with open(file_path, 'r') as rf:
-            return json.load(rf)
+            loaded_receipt_json = json.load(rf)
     except:
         print('Error: Costco receipt could not be read or was not found.')
 
+    return loaded_receipt_json
 
 def get_item_data(item: ArrayItem) -> Item:
     # making the names easier to read (lowercasing)
@@ -85,7 +87,7 @@ def get_receipt_metadata(receipts: List[Metadata]) -> Metadata:
     return parsed_metadata
 
 
-def parse_receipt(receipt: ReceiptJson) -> List[object]:
+def parse_receipt(receipt: ReceiptJson) -> Tuple[List[Item], Metadata]:
     items: List[Item] = []
     receipts = [
         item for item in receipt.get('data', {}).get('receipts', {})
@@ -97,7 +99,7 @@ def parse_receipt(receipt: ReceiptJson) -> List[object]:
         if r['itemArray'] is not None:
             items = [get_item_data(item) for item in r['itemArray']]
 
-    return [items, metadata]
+    return (items, metadata)
 
 
 def build_metadata_row(row_name: str, value: int) -> Item:

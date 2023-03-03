@@ -25,9 +25,8 @@ def main(sys_args: Optional[List[str]] = None) -> int:
         parser.print_help()
         sys.exit(1)
 
-    receipt = get_receipt_json(args.receipt[0])
-    [receipt, metadata] = parse_receipt(receipt)
-
+    receipt_json = get_receipt_json(args.receipt[0])
+    (receipt, metadata) = parse_receipt(receipt_json)
     write_to_csv(receipt, metadata)
 
     return 0
