@@ -1,8 +1,6 @@
 import subprocess
 
-new_usage = subprocess.run(['python3', '-m', 'costcoparser', '-h'],
-                           capture_output=True,
-                           text=True).stdout.strip('\n')
+new_usage = subprocess.run(['python3', '-m', 'costcoparser', '-h'], capture_output=True, text=True).stdout.strip('\n')
 
 start = ('<!--- START USAGE -->\n' '```shell script\n')
 end = ('\n```\n' '<!--- END USAGE -->\n')
