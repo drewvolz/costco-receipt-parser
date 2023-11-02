@@ -60,7 +60,7 @@ usage: costcoparser [-h] -r RECEIPT
 
 Parse Costco JSON reciept data into a CSV.
 
-optional arguments:
+options:
   -h, --help            show this help message and exit
   -r RECEIPT, --receipt RECEIPT
                         the path to the receipt JSON file
