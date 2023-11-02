@@ -30,119 +30,107 @@ const consoleWarn = (message) => {
   console.warn(`[costcoparser]: ${message}`)
 }
 
-const fetchToken = () => {
-  return new Promise(function (resolve, reject) {
-    let tokenXhr = new XMLHttpRequest()
-    tokenXhr.open('GET', 'https://www.costco.com/user-session-token')
-    tokenXhr.setRequestHeader('Access-Control-Allow-Origin', '*')
-    tokenXhr.onload = async function () {
-      if (tokenXhr.status === 200) {
-        resolve(tokenXhr.response)
-      } else {
-        reject(tokenXhr.status)
-      }
-    }
-    tokenXhr.send()
-  })
-}
 
 const fetchReceipt = async (receiptDate) => {
-  let token = await fetchToken()
-
   return await new Promise(function (resolve, reject) {
     let xhr = new XMLHttpRequest()
     xhr.responseType = 'json'
-    xhr.open('POST', 'https://api.costco.com/ebusiness/order/v1/orders/graphql')
-    xhr.setRequestHeader('Access-Control-Allow-Origin', '*')
-    xhr.setRequestHeader('Content-Type', 'application/json')
-    xhr.setRequestHeader('costco.env', 'PROD')
-    xhr.setRequestHeader('costco.service', 'restOrders')
+    xhr.open('POST', 'https://ecom-api.costco.com/ebusiness/order/v1/orders/graphql')
+    xhr.setRequestHeader("Access-Control-Allow-Origin", "*")
+    xhr.setRequestHeader('Content-Type', 'application/json-patch+json')
+    xhr.setRequestHeader('Costco.Env', 'ecom')
+    xhr.setRequestHeader('Costco.Service', 'restOrders')
+    xhr.setRequestHeader('Costco-X-Wcs-Clientid', localStorage.getItem('clientID'))
     xhr.setRequestHeader(
-      'client-identifier',
+      'Client-Identifier',
       '481b1aec-aa3b-454b-b81b-48187e28f205'
     )
-    xhr.setRequestHeader('costco-x-authorization', 'Bearer ' + token)
+    xhr.setRequestHeader('Costco-X-Authorization', 'Bearer ' + localStorage.getItem('idToken'))
 
     const getReceiptQuery = {
       query: `
-                query {
-                    receipts(startDate: "${receiptDate}" endDate: "${receiptDate}") {
-                        warehouseName
-                        documentType
-                        transactionDateTime
-                        transactionDate
-                        companyNumber
-                        warehouseNumber
-                        operatorNumber
-                        warehouseName
-                        warehouseShortName
-                        registerNumber
-                        transactionNumber
-                        transactionType
-                        transactionBarcode
-                        total
-                        warehouseAddress1
-                        warehouseAddress2
-                        warehouseCity
-                        warehouseState
-                        warehouseCountry
-                        warehousePostalCode
-                        totalItemCount
-                        subTotal
-                        taxes
-                        total
-                        itemArray {
-                            itemNumber
-                            itemDescription01
-                            frenchItemDescription1
-                            itemDescription02
-                            frenchItemDescription2
-                            itemIdentifier
-                            unit
-                            amount
-                            taxFlag
-                            merchantID
-                            entryMethod
-                        }
-                        tenderArray {
-                            tenderTypeCode
-                            tenderDescription
-                            amountTender
-                            displayAccountNumber
-                            sequenceNumber
-                            approvalNumber
-                            responseCode
-                            transactionID
-                            merchantID
-                            entryMethod
-                        }
-                        couponArray {
-                            upcnumberCoupon
-                            voidflagCoupon
-                            refundflagCoupon
-                            taxflagCoupon
-                            amountCoupon
-                        }
-                        subTaxes {
-                            tax1
-                            tax2
-                            tax3
-                            tax4
-                            aTaxPercent
-                            aTaxLegend
-                            aTaxAmount
-                            bTaxPercent
-                            bTaxLegend
-                            bTaxAmount
-                            cTaxPercent
-                            cTaxLegend
-                            cTaxAmount
-                            dTaxAmount
-                        }
-                        instantSavings
-                        membershipNumber
-                    }
-                }`.replace(/\s+/g, ' '),
+            query receipts($startDate: String!, $endDate: String!) {
+              receipts(startDate: $startDate, endDate: $endDate) {
+                warehouseName
+                documentType
+                transactionDateTime
+                transactionDate
+                companyNumber
+                warehouseNumber
+                operatorNumber
+                warehouseName
+                warehouseShortName
+                registerNumber
+                transactionNumber
+                transactionType
+                transactionBarcode
+                total
+                warehouseAddress1
+                warehouseAddress2
+                warehouseCity
+                warehouseState
+                warehouseCountry
+                warehousePostalCode
+                totalItemCount
+                subTotal
+                taxes
+                total
+                itemArray {
+                    itemNumber
+                    itemDescription01
+                    frenchItemDescription1
+                    itemDescription02
+                    frenchItemDescription2
+                    itemIdentifier
+                    unit
+                    amount
+                    taxFlag
+                    merchantID
+                    entryMethod
+                }
+                tenderArray {
+                    tenderTypeCode
+                    tenderDescription
+                    amountTender
+                    displayAccountNumber
+                    sequenceNumber
+                    approvalNumber
+                    responseCode
+                    transactionID
+                    merchantID
+                    entryMethod
+                }
+                couponArray {
+                    upcnumberCoupon
+                    voidflagCoupon
+                    refundflagCoupon
+                    taxflagCoupon
+                    amountCoupon
+                }
+                subTaxes {
+                    tax1
+                    tax2
+                    tax3
+                    tax4
+                    aTaxPercent
+                    aTaxLegend
+                    aTaxAmount
+                    bTaxPercent
+                    bTaxLegend
+                    bTaxAmount
+                    cTaxPercent
+                    cTaxLegend
+                    cTaxAmount
+                    dTaxAmount
+                }
+                instantSavings
+                membershipNumber
+              }
+            }`.replace(/\s+/g, ' '),
+      variables: {
+        startDate: receiptDate,
+        endDate: receiptDate,
+      },
     }
 
     xhr.onload = async function () {
@@ -228,7 +216,7 @@ const saveToDisk = (receipt, outfile) => {
 
 const run = async () => {
   let receiptDate = getFocusedReceiptDate()
-  let outfile = `costco_${receiptDate}.csv`
+  let outfile = `costco-${receiptDate}.csv`.replaceAll('/', '-')
   let receipt = await fetchReceipt(receiptDate)
 
   if (receiptDate === null) {
