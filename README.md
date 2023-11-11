@@ -14,7 +14,7 @@ This method can download and convert a web receipt to CSV using only the javascr
 2. Click on the "In-Warehouse" tab
 3. Click on the "View Receipt" button
 4. Open the Web Inspector
-5. Copy/paste the contents of [`downloader.js`](https://github.com/drewvolz/costco-receipt-parser/blob/js-downloader-parser-converter/costcoparser/script/downloader.js) from the `js-downloader-parser-converter` branch into the console
+5. Copy/paste the contents of [`downloader.js`](https://github.com/drewvolz/costco-receipt-parser/blob/main/costcoparser/script/downloader.js) into the console
 
 ### Option 2: Python (manual fetch + convert)
 
